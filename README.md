@@ -1,4 +1,4 @@
-# HttpFarm - A time-based HTTP job scheduler
+# HttpFarm - A time-based HTTP job scheduler [![Build Status](https://travis-ci.org/edouardswiac/httpfarm.svg?branch=master)](https://travis-ci.org/edouardswiac/httpfarm)
 
 It's like cron, because it uses the same crontab expression, but it's dedicated to HTTP jobs. A convenient REST management API lets you create/view/delete jobs and their detailed execution log.
 
