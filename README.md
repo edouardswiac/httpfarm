@@ -6,7 +6,7 @@ It's like cron, because it uses the same crontab expression, but it's dedicated 
 - In memory storage (Persistent storage planned in future versions)
 - REST/JSON management API (Create/View/Delete jobs and executions)
 - ~16mo JAR with 0 dependencies.
-- Asynchronous I/O enables hundred of concurrent job executions on modest hardware
+- Asynchronous I/O enables XXX of concurrent job executions on modest hardware 
 
 ## Why not just use cron?
 - Errors are swallowed unless execution output is piped to a notification system
@@ -17,7 +17,7 @@ It's like cron, because it uses the same crontab expression, but it's dedicated 
 Download the latest release. Run it with
 `java -jar httpfarm.jar`
 
-HttpFarm will start polling for due jobs every minute.
+The REST API will be available on port `8080`. HttpFarm will start polling for due jobs every minute.
 ```
 23:30:41,267 [main] INFO  io.httpfarm.Main - Welcome to HTTPFarm!
 23:30:41,271 [main] INFO  io.httpfarm.Main - Press ctrl+c to exit.
@@ -31,11 +31,23 @@ HttpFarm will start polling for due jobs every minute.
 ## Configuration
 
 ### Add a new job
-`POST /jobs`
+    curl --request POST \
+      --url http://localhost:8080/jobs/ \
+      --header 'content-type: application/json' \
+      --data '{
+            "url": "https://httpbin.org/html",
+            "headers": {},
+            "cronExpr": "* * * * *",
+            "timeoutMillis": 5000,
+            "maxTries": 2,
+            "method": "GET"}'
 
-### View a job
-`GET /jobs/$UUID`
+### List jobs
+    curl http://localhost:8080/jobs
+      
+### View a job and its executions
+    curl  http://localhost:8080/jobs/$job_uuid
 
 ### Delete a job
-`DELETE /jobs/$UUID`
+    curl --request DELETE http://localhost:8080/jobs/c9fd565c-7a00-46ab-9f1d-85a7831cd98e
 
