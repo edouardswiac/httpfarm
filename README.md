@@ -1,12 +1,13 @@
 # HttpFarm - A time-based HTTP job scheduler [![Build Status](https://travis-ci.org/edouardswiac/httpfarm.svg?branch=master)](https://travis-ci.org/edouardswiac/httpfarm)
 
-It's like cron, because it uses the same crontab expression, but it's dedicated to HTTP jobs. A convenient REST management API lets you create/view/delete jobs and their detailed execution log.
+HTTP requests engine meets crontab. 
 
 ## Features
-- In memory storage (Persistent storage planned in future versions)
-- REST/JSON management API (Create/View/Delete jobs and executions)
-- ~16mo JAR with 0 dependencies.
-- Asynchronous I/O enables XXX of concurrent job executions on modest hardware 
+- Configurable HTTP method, headers, timeouts, retries.
+- Basic task flow: trigger Job B after Job A succceeds. (TODO)
+- Simple REST management API centered around two nouns: Jobs and JobExecutions
+- Asynchronous I/O enables XXX of concurrent job executions on modest hardware  (TODO)
+- ~16mo fat JAR with 0 dependencies. Requires Java 8+.
 
 ## Why not just use cron?
 - Errors are swallowed unless execution output is piped to a notification system
@@ -42,12 +43,63 @@ The REST API will be available on port `8080`. HttpFarm will start polling for d
             "maxTries": 2,
             "method": "GET"}'
 
+
 ### List jobs
     curl http://localhost:8080/jobs
       
 ### View a job and its executions
     curl  http://localhost:8080/jobs/$job_uuid
-
+    {
+    "executions": [
+        {
+          "uuid": "e6785d8b-61ae-48dd-8d2c-d5b34a7f331d",
+          "url": "https://httpbin.org/html",
+          "jobUuid": "97de3373-7ffa-47f2-91d0-f11161848154",
+          "start": 1522028484547,
+          "end": 1522028484706,
+          "requestHeaders": {},
+          "responseBody": "[SNIP]",
+          "responseHeaders": {
+            "X-Processed-Time": "0",
+            "Server": "meinheld/0.6.1",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": "true",
+            "Connection": "close",
+            "Content-Length": "3741",
+            "Date": "Mon, 26 Mar 2018 01:41:24 GMT",
+            "Via": "1.1 vegur",
+            "X-Powered-By": "Flask",
+            "Content-Type": "text/html; charset=utf-8"
+          },
+          "responseStatusCode": 200,
+          "retryFrom": null,
+          "error": null
+        },
+        {
+          "uuid": "c79911f1-470d-4c68-96a1-08bff8c170c2",
+          "url": "https://httpbin.org/html",
+          "jobUuid": "97de3373-7ffa-47f2-91d0-f11161848154",
+          "start": 1522028424593,
+          "end": 1522028424885,
+          "requestHeaders": {},
+          "responseBody": "[SNIP]",
+          "responseHeaders": {
+            "X-Processed-Time": "0",
+            "Server": "meinheld/0.6.1",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Credentials": "true",
+            "Connection": "close",
+            "Content-Length": "3741",
+            "Date": "Mon, 26 Mar 2018 01:40:24 GMT",
+            "Via": "1.1 vegur",
+            "X-Powered-By": "Flask",
+            "Content-Type": "text/html; charset=utf-8"
+          },
+          "responseStatusCode": 200,
+          "retryFrom": null,
+          "error": null
+        }]
+    }
 ### Delete a job
-    curl --request DELETE http://localhost:8080/jobs/c9fd565c-7a00-46ab-9f1d-85a7831cd98e
+    curl --request DELETE http://localhost:8080/jobs/$job_uuid
 
